@@ -1,0 +1,65 @@
+!! implementation might change !!
+
+order of operations:
+
+GENERATING DATA
++---------+
+| startup |
++---------+
+     V
++----------+
+| provider | (lowest level; provides raw data: buffer list, window list...)
++----------+
+   |     | (only if sorting is requested by upper level)
+   |     V 
+   |   +--------+      +----------------+
+   |   | sorter | <==> | sorting method |
+   |   +--------+      +----------------+
+   |_____/
+   |
+   V
++-----------+
+| formatter | (turns raw data into printable string)
++-----------+
+     V
++----------+      +------------------+
+| assigner | <==> | assigning method | (also handles key conflicts)
++----------+      +------------------+
+    V
++------+
+| post | (optional; only run if upper level succeeded)
++------+
+
+
+DRAWING
+      +-------------+
+      | drawer mode | (determined by higher level; probably user)
+      +-------------+
+        V         V
++-----------+  +--------+     +--------+      +-------------+
+| virt text |  | window | -+- | buffer | <==> | highlighter |
++-----------+  +--------+  |  +--------+      +-------------+
+      V                    V (write buffer to window)
++-------------+     +---------------+
+| render text |     | render window |
++-------------+     +---------------+
+
+
+HANDLING INPUT
+      +---------+
+      | capture |
+      +---------+
+       V       V
++--------+   +---+
+| action |   |   | (quit or error)
++--------+   +---+
+     |________/ |
+     |          V 
+     |       +-------+
+     V       | error |
++---------+  +-------+
+| cleanup |____/
+| & exit  |
++---------+       
+
+// vim: nolist expandtab
