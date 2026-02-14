@@ -4,7 +4,7 @@ local M = {}
 ---@return integer cols
 function M.resolve_width(width)
     if width > 0 and width <= 1 then
-        return math.floor(vim.o.columns * width + 0.5)
+        return vim.fn.round(vim.o.columns * width)
     elseif width > 1 then
         return width
     else
@@ -16,7 +16,7 @@ end
 ---@return integer rows
 function M.resolve_height(height)
     if height > 0 and height <= 1 then
-        return math.floor(vim.o.lines * height + 0.5)
+        return vim.fn.round(vim.o.lines * height)
     elseif height > 1 then
         return height
     else

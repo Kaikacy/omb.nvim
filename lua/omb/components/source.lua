@@ -7,7 +7,7 @@
 
 ---@class omb.Source.Config
 ---@field provider omb.Source.Provider
----@field formatter omb.Source.Formatter
+---@field formatter? omb.Source.Formatter
 ---@field assigner omb.Source.Assigner
 
 ---@class omb.Source.PartialContext
@@ -37,7 +37,9 @@ function Source:new(config)
     ---@type omb.Source
     local source = {
         provider = config.provider,
-        formatter = config.formatter,
+        formatter = config.formatter or function(ctx)
+            return vim.tbl_map(tostring, ctx.list)
+        end,
         assigner = config.assigner,
         ctx = {},
     }
@@ -47,15 +49,11 @@ end
 ---@return table
 function Source:update()
     local ctx = self.ctx
+    ---@cast ctx omb.Source.FullContext
     local user_data = {}
 
-    ---@cast ctx omb.Source.FormatterContext
     ctx.list = self.provider(ctx, user_data)
-
-    ---@cast ctx omb.Source.AssignerContext
     ctx.formatted = self.formatter(ctx, user_data)
-
-    ---@cast ctx omb.Source.FullContext
     ctx.assignments, ctx.assigned_keys = self.assigner(ctx, user_data)
 
     assert(#ctx.assigned_keys > 0, "no items in source")
