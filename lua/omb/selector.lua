@@ -36,10 +36,6 @@ function Selector:run(user_data)
     self:update(user_data)
     self.drawer:display()
     self.handler:run(self.assignments, self.assigned_keys, user_data)
-    self:stop()
-end
-
-function Selector:stop()
     self.drawer:hide()
 end
 

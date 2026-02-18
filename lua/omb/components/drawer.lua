@@ -58,10 +58,9 @@ function Drawer:new(config)
         width = width,
         height = height,
         extends_char = config.extends_char or ">",
-        ns = vim.api.nvim_create_namespace(""),
+        ns = core.state.ns,
         state = {
             buf = -1,
-            win = -1,
             max_width = -1,
             max_height = -1,
         },
