@@ -1,3 +1,4 @@
+local core = require("omb.core")
 local utils = require("omb.utils")
 
 ---@alias omb.Drawer.Highlight fun(ctx: omb.Drawer.HighlighterContext, my: table): hl_ranges: omb.Drawer.HlRange[]|string
@@ -19,7 +20,6 @@ local utils = require("omb.utils")
 
 ---@class omb.Drawer.State
 ---@field buf integer
----@field win integer
 ---@field max_width integer
 ---@field max_height integer
 
@@ -170,8 +170,7 @@ function Drawer:update(assignments, assigned_keys, user_data)
 end
 
 function Drawer:display()
-    -- should this assert?
-    assert(not vim.api.nvim_win_is_valid(self.state.win), "window should be closed before calling open")
+    assert(not vim.api.nvim_win_is_valid(core.state.win), "another drawer is active")
     assert(vim.api.nvim_buf_is_valid(self.state.buf), "buffer isn't valid")
 
     local row, col, width, height, anchor = self:_get_rect()
@@ -190,20 +189,12 @@ function Drawer:display()
     vim.wo[win].wrap = false
     vim.wo[win].list = true
     vim.wo[win].listchars = "extends:" .. self.extends_char
-    self.state.win = win
+    core.state.win = win
 end
 
 function Drawer:hide()
-    assert(vim.api.nvim_win_is_valid(self.state.win), "window should be open before calling close")
-    vim.api.nvim_win_hide(self.state.win)
-end
-
-function Drawer:toggle()
-    if vim.api.nvim_win_is_valid(self.state.win) then
-        self:hide()
-    else
-        self:display()
-    end
+    assert(vim.api.nvim_win_is_valid(core.state.win), "window should be open before calling close")
+    vim.api.nvim_win_hide(core.state.win)
 end
 
 return Drawer
