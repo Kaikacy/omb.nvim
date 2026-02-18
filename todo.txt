@@ -1,0 +1,28 @@
+- REDESIGN SOURCE ASSIGNER, ADD SOURCE SORTER
+    * Makes assigner simpler with negligible downside *
+    Instead of returning two tables, assigner will only return sorted keys, for values sorter subcomponent should be used.
+    No map structure (hashmap) will be ever used.
+    Keys list returned by assigner shall have same length as items list.
+    Separate sorters could be used before and after formatter.
+    Conciderations:
+        - Unlike before, validation will be required to ensure no key name conflicts
+
+- MERGE DRAWER HIGHLIGHT SUBCOMPONENT INTO SOURCE FORMATTER
+    * Makes highlight system and drawer component simpler *
+    Remove highlight subcomponent and instead expand functionallity of source formatter.
+    Although unsure, formatter could return list of text chunks paired with highlight group. Texts will be concatinated to create an item. Highlights will be used by drawer. System was inspired by API of neovim itself.
+    Source context after formatter will contain structured and raw information about format.
+    Other benefits:
+        - Guaranteed safety from out-of-range errors when highlighting
+        - Greatly enhances UX, by avoiding index calculations and length checks by user
+
+- REPLACE SOURCE FORMATTER WITH FORMAT ITERATOR
+    * Improves UX *
+    Formatter function will be run for each item in the provided list. Structuring return value will be handled internally.
+    Formatter Context will only contain information about current item.
+
+- FINISH HANDLING SYSTEM AND HANDLER COMPONENT
+    * Makes handler component much more powerful *
+    On top of user interaction, any other component error will be redirected to handler. Error handling will be fully cusomizable. As lua does not have error handling system, error codes will be used.
+    Although Unsure, custom action might not be specifiable, instead after successful selection handler will return information about selected item
+    If desired by user, any untrusted function could be run in protected mode
