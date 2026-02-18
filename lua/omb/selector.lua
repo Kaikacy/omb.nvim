@@ -4,6 +4,8 @@ local core = require("omb.core")
 ---@field source omb.Source
 ---@field drawer omb.Drawer
 ---@field handler omb.Handler
+---@field assignments omb.Source.Assignments
+---@field assigned_keys omb.Source.AssignedKeys
 local Selector = {}
 
 ---@param source_cfg omb.Source.Config
@@ -16,13 +18,29 @@ function Selector:new(source_cfg, drawer_cfg, handler_cfg)
         source = require("omb.components.source"):new(source_cfg),
         drawer = require("omb.components.drawer"):new(drawer_cfg),
         handler = require("omb.components.handler"):new(handler_cfg),
+        assignments = {},
+        assigned_keys = {},
     }
     return setmetatable(selector, { __index = self })
 end
 
-function Selector:update() end
-function Selector:open() end
-function Selector:run() end
-function Selector:stop() end
+---@param user_data table
+function Selector:update(user_data)
+    self.source:update()
+    self.assignments, self.assigned_keys = self.source:get()
+    self.drawer:update(self.assignments, self.assigned_keys, user_data)
+end
+
+---@param user_data table
+function Selector:run(user_data)
+    self:update(user_data)
+    self.drawer:display()
+    self.handler:run(self.assignments, self.assigned_keys, user_data)
+    self:stop()
+end
+
+function Selector:stop()
+    self.drawer:hide()
+end
 
 return Selector

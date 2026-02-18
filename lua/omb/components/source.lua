@@ -62,7 +62,7 @@ function Source:update()
     return user_data
 end
 
----@return omb.Source.Assignments, omb.Source.AssignedKeys
+---@return omb.Source.Assignments assignments, omb.Source.AssignedKeys assigned_keys
 function Source:get()
     -- update has to be called at least once
     assert(self.ctx.assignments, "ctx has to have type FullContext before calling get")

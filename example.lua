@@ -98,4 +98,4 @@ local generic_handler = {
 }
 
 local buf_switcher = omb.selector(buf_source, generic_drawer, generic_handler)
-buf_switcher.run({ hidden = true }) -- content of `my` table when starting up
+buf_switcher:run({ hidden = true }) -- content of `my` table when starting up

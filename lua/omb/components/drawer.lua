@@ -125,6 +125,7 @@ function Drawer:update(assignments, assigned_keys, user_data)
     for _, key in ipairs(assigned_keys) do
         local item = assignments[key]
         assert(item, "assignments and assigned_keys don't match")
+        assert(#item > 0, "empty item")
         local line = key .. self.key_separator .. item
         table.insert(lines, line)
         if self.state.max_width < #line then
