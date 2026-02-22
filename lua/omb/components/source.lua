@@ -1,4 +1,5 @@
 ---@alias omb.Source.Provider fun(ctx: omb.Source.ProviderContext, my: table): list: any[]
+---@alias omb.Source.Sorter fun(ctx: omb.Source.SorterContext, my: table): sorted: any[]
 ---@alias omb.Source.Formatter fun(ctx: omb.Source.FormatterContext, my: table): formatted: string[]
 ---@alias omb.Source.Assigner fun(ctx: omb.Source.AssignerContext, my: table): assignments: omb.Source.Assignments, assigned_keys: string[]
 
@@ -7,6 +8,7 @@
 
 ---@class omb.Source.Config
 ---@field provider omb.Source.Provider
+---@field sorter? omb.Source.Sorter
 ---@field formatter? omb.Source.Formatter
 ---@field assigner omb.Source.Assigner
 
@@ -14,8 +16,11 @@
 
 ---@class omb.Source.ProviderContext: omb.Source.PartialContext
 
----@class omb.Source.FormatterContext: omb.Source.ProviderContext
+---@class omb.Source.SorterContext: omb.Source.ProviderContext
 ---@field list any[]
+
+---@class omb.Source.FormatterContext: omb.Source.SorterContext
+---@field sorted any[]
 
 ---@class omb.Source.AssignerContext: omb.Source.FormatterContext
 ---@field formatted string[]
@@ -26,6 +31,7 @@
 
 ---@class omb.Source
 ---@field provider omb.Source.Provider
+---@field sorter omb.Source.Sorter
 ---@field formatter omb.Source.Formatter
 ---@field assigner omb.Source.Assigner
 ---@field package ctx omb.Source.PartialContext|omb.Source.FullContext
@@ -37,6 +43,9 @@ function Source:new(config)
     ---@type omb.Source
     local source = {
         provider = config.provider,
+        sorter = config.sorter or function(ctx)
+            return ctx.list
+        end,
         formatter = config.formatter or function(ctx)
             return vim.tbl_map(tostring, ctx.list)
         end,
@@ -53,6 +62,7 @@ function Source:update()
     local user_data = {}
 
     ctx.list = self.provider(ctx, user_data)
+    ctx.sorted = self.sorter(ctx, user_data)
     ctx.formatted = self.formatter(ctx, user_data)
     ctx.assignments, ctx.assigned_keys = self.assigner(ctx, user_data)
 
