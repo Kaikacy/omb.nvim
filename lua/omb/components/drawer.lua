@@ -109,11 +109,11 @@ function Drawer:_get_rect()
     return row, col, width, height, yanchor .. xanchor
 end
 
----@param assignments omb.Source.Assignments
----@param assigned_keys omb.Source.AssignedKeys
+---@param keys string[]
+---@param items string[]
 ---@param user_data table
 ---@return table user_data
-function Drawer:update(assignments, assigned_keys, user_data)
+function Drawer:update(keys, items, user_data)
     if not vim.api.nvim_buf_is_valid(self.state.buf) then
         self.state.buf = vim.api.nvim_create_buf(false, true)
         assert(self.state.buf ~= 0, "couldn't create buffer")
@@ -121,10 +121,7 @@ function Drawer:update(assignments, assigned_keys, user_data)
     local buf = self.state.buf
 
     local lines = {}
-    for _, key in ipairs(assigned_keys) do
-        local item = assignments[key]
-        assert(item, "assignments and assigned_keys don't match")
-        assert(#item > 0, "empty item")
+    for _, key, item in utils.zip_iter(keys, items) do
         local line = key .. self.key_separator .. item
         table.insert(lines, line)
         if self.state.max_width < #line then
@@ -139,9 +136,7 @@ function Drawer:update(assignments, assigned_keys, user_data)
 
     vim.api.nvim_buf_set_lines(buf, 0, #lines, false, lines)
 
-    for i, key in ipairs(assigned_keys) do
-        local item = assignments[key]
-
+    for i, key, item in utils.zip_iter(keys, items) do
         local hl_ranges = self.highlight({ item = item, key = key }, user_data)
         local item_start = #key + #self.key_separator
         if hl_ranges == "string" then

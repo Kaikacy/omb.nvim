@@ -34,4 +34,37 @@ function M.clamp(n, min, max)
     return math.max(math.min(n, max), min)
 end
 
+---Returns first duplicate in a list or nil if there aren't any
+---@generic T
+---@param list T[]
+---@return T?
+function M.get_first_dup(list)
+    local seen = {}
+    for _, v in ipairs(list) do
+        if seen[v] then
+            return v
+        end
+        seen[v] = true
+    end
+    return nil
+end
+
+---Zips two lists and returns iterator to use in for loop (idx, elem1, elem2)
+---Doesn't check list size
+---@generic T, U
+---@param list1 T[]
+---@param list2 U[]
+---@return fun(): integer, T, U
+function M.zip_iter(list1, list2)
+    local i = 0
+    local n = math.min(#list1, #list2)
+    return function()
+        i = i + 1
+        if i > n then
+            return nil
+        end
+        return i, list1[i], list2[i]
+    end
+end
+
 return M

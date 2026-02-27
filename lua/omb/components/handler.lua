@@ -1,3 +1,5 @@
+local utils = require("omb.utils")
+---
 ---@alias omb.Handler.Action fun(ctx: omb.Handler.ActionContext, my: table)
 
 ---@class omb.Handler.ActionContext
@@ -29,10 +31,10 @@ function Handler:new(config)
     return setmetatable(handler, { __index = self })
 end
 
----@param assignments omb.Source.Assignments
----@param assigned_keys omb.Source.AssignedKeys
+---@param keys string[]
+---@param items string[]
 ---@param user_data table
-function Handler:run(assignments, assigned_keys, user_data)
+function Handler:run(keys, items, user_data)
     -- TODO: catch interupt (<C-c>)
     -- TODO: case-sensitivity (configurable)
     -- TODO: instead of calling action directly, defer it at the end of selector (maybe configurable)
@@ -42,9 +44,9 @@ function Handler:run(assignments, assigned_keys, user_data)
             return
         end
     end
-    for i, key in ipairs(assigned_keys) do
+    for i, key, item in utils.zip_iter(keys, items) do
         if char == key:lower() then
-            self.action({ key = key, formatted = assignments[key], index = i }, user_data)
+            self.action({ key = key, formatted = item, index = i }, user_data)
             return
         end
     end
