@@ -2,13 +2,13 @@ local utils = require("omb.utils")
 
 ---@alias omb.Source.Provider fun(ctx: omb.Source.ProviderContext, my: table): list: any[]
 ---@alias omb.Source.Sorter fun(ctx: omb.Source.SorterContext, my: table): sorted: any[]
----@alias omb.Source.Formatter fun(ctx: omb.Source.FormatterContext, my: table): formatted: string[]
+---@alias omb.Source.Format fun(ctx: omb.Source.FormatContext, my: table): fmt_item: string
 ---@alias omb.Source.Assigner fun(ctx: omb.Source.AssignerContext, my: table): assigned_keys: string[]
 
 ---@class omb.Source.Config
 ---@field provider omb.Source.Provider
 ---@field sorter? omb.Source.Sorter
----@field formatter? omb.Source.Formatter
+---@field format? omb.Source.Format
 ---@field assigner omb.Source.Assigner
 
 ---@class omb.Source.PartialContext
@@ -18,18 +18,19 @@ local utils = require("omb.utils")
 ---@class omb.Source.SorterContext: omb.Source.ProviderContext
 ---@field list any[]
 
----@class omb.Source.FormatterContext: omb.Source.SorterContext
-
----@class omb.Source.AssignerContext: omb.Source.FormatterContext
+---@class omb.Source.AssignerContext: omb.Source.SorterContext
 ---@field formatted string[]
 
 ---@class omb.Source.FullContext: omb.Source.AssignerContext
 ---@field keys string[]
 
+---@class omb.Source.FormatContext
+---@field item any
+
 ---@class omb.Source
 ---@field provider omb.Source.Provider
 ---@field sorter omb.Source.Sorter
----@field formatter omb.Source.Formatter
+---@field format omb.Source.Format
 ---@field assigner omb.Source.Assigner
 ---@field package ctx omb.Source.PartialContext|omb.Source.FullContext
 local Source = {}
@@ -43,8 +44,8 @@ function Source:new(config)
         sorter = config.sorter or function(ctx)
             return ctx.list
         end,
-        formatter = config.formatter or function(ctx)
-            return vim.tbl_map(tostring, ctx.list)
+        format = config.format or function(ctx)
+            return tostring(ctx.item)
         end,
         assigner = config.assigner,
         ctx = {},
@@ -60,7 +61,9 @@ function Source:update()
 
     ctx.list = self.provider(ctx, user_data)
     ctx.list = self.sorter(ctx, user_data)
-    ctx.formatted = self.formatter(ctx, user_data)
+    ctx.formatted = vim.tbl_map(function(item)
+        return self.format({ item = item }, user_data)
+    end, ctx.list)
     ctx.keys = self.assigner(ctx, user_data)
 
     assert(#ctx.keys > 0, "no keys assigned in source")

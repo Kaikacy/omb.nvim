@@ -16,7 +16,7 @@ X REDESIGN SOURCE ASSIGNER, ADD SOURCE SORTER
         - Guaranteed safety from out-of-range errors when highlighting
         - Greatly enhances UX, by avoiding index calculations and length checks by user
 
-- REPLACE SOURCE FORMATTER WITH FORMAT ITERATOR
+X REPLACE SOURCE FORMATTER WITH FORMAT ITERATOR
     * Improves UX *
     Formatter function will be run for each item in the provided list. Structuring returned value will be handled internally.
     Formatter Context will only contain information about current item.
