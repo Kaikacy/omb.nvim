@@ -1,4 +1,4 @@
-- REDESIGN SOURCE ASSIGNER, ADD SOURCE SORTER
+X REDESIGN SOURCE ASSIGNER, ADD SOURCE SORTER
     * Simplifies assigner with negligible downside *
     Instead of returning two tables, assigner will only return sorted keys, for values sorter subcomponent should be used.
     No map structure (hashmap) will be ever used.
