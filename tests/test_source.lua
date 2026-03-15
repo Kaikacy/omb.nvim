@@ -27,23 +27,26 @@ end
 T["format function"] = function()
     local expected = {
         -- key, item, hls (hl: start, end (0-based, end-exclusive), hl group)
-        { "1", "abcd", vim.NIL },
-        { "2", "abcdef", { { 4, 6, "Comment" } } },
-        { "3", "abcdef", { { 0, 4, "Special" }, { 4, 6, "Comment" } } },
+        { "1", "abcd", {} },
+        { "2", "abcdef", {} },
+        { "3", "abcdef", { { 4, 6, "Comment" } } },
         { "4", "abcdef", { { 0, 4, "Special" }, { 4, 6, "Comment" } } },
+        { "5", "abcdef", { { 0, 4, "Special" }, { 4, 6, "Comment" } } },
     }
     local source = M:new({
         provider = function()
-            return { 1, 2, 3, 4 }
+            return { 1, 2, 3, 4, 5 }
         end,
         format = function(ctx)
             if ctx.item == 1 then
                 return "abcd"
             elseif ctx.item == 2 then
-                return { "abcd", { "ef", "Comment" } }
+                return { "abcd", "ef" }
             elseif ctx.item == 3 then
-                return { { "abcd", "Special" }, { "ef", "Comment" } }
+                return { "abcd", { "ef", "Comment" } }
             elseif ctx.item == 4 then
+                return { { "abcd", "Special" }, { "ef", "Comment" } }
+            elseif ctx.item == 5 then
                 return { { "abcd", "Special" }, { "", "Whatever" }, { "ef", "Comment" } }
             else
                 error("unreachable")
