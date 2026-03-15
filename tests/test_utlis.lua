@@ -29,15 +29,19 @@ T["get first dup"] = function()
 end
 T["zip iter"] = function()
     local expected = {
-        { "a", "A" },
-        { "b", "B" },
-        { "c", "C" },
-        { "d", "D" },
+        { "a", "A", "1" },
+        { "b", "B", "2" },
+        { "c", "C", "3" },
+        { "d", "D", "4" },
     }
     local list1 = { "a", "b", "c", "d" }
     local list2 = { "A", "B", "C", "D" }
+    local list3 = { "1", "2", "3", "4" }
     for i, elem1, elem2 in M.zip_iter(list1, list2) do
-        h.eq({ elem1, elem2 }, expected[i])
+        h.eq({ elem1, elem2, list3[i] }, expected[i])
+    end
+    for i, elem1, elem2, elem3 in M.zip_iter3(list1, list2, list3) do
+        h.eq({ elem1, elem2, elem3 }, expected[i])
     end
 end
 
