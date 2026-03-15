@@ -1,12 +1,14 @@
 local utils = require("omb.utils")
+local core = require("omb.core")
 
 ---@alias omb.Source.Provider fun(ctx: omb.Source.ProviderContext, my: table): list: any[]
 ---@alias omb.Source.Sorter fun(ctx: omb.Source.SorterContext, my: table): sorted: any[]
 ---@alias omb.Source.Format fun(ctx: omb.Source.FormatContext, my: table): fmt_items: (omb.Source.FmtItem)[]|string
 ---@alias omb.Source.Assigner fun(ctx: omb.Source.AssignerContext, my: table): assigned_keys: string[]
 
----@alias omb.Source.FmtItem [string, string]|string (text and hl group) or just text
+---@alias omb.Source.FmtItem [string, string]|string text and hl group or just text
 ---@alias omb.Source.HlRange [integer, integer, string] start column, end column (0-based, end-exclusive) and hl group
+---@alias omb.Source.Highlight omb.Source.HlRange[]
 
 ---@class omb.Source.Config
 ---@field provider omb.Source.Provider
@@ -23,8 +25,7 @@ local utils = require("omb.utils")
 
 ---@class omb.Source.AssignerContext: omb.Source.SorterContext
 ---@field formatted string[]
---  can't use lua nil as it gets confusing in lists
----@field highlights (omb.Source.HlRange[]|vim.NIL)[]
+---@field highlights omb.Source.Highlight[]
 
 ---@class omb.Source.FullContext: omb.Source.AssignerContext
 ---@field keys string[]
@@ -38,14 +39,18 @@ local utils = require("omb.utils")
 ---@field sorter omb.Source.Sorter
 ---@field format omb.Source.Format
 ---@field assigner omb.Source.Assigner
+---@field id integer
+---@field parent_id integer
 ---@field ctx omb.Source.PartialContext|omb.Source.FullContext
 local Source = {}
 
 ---@param config omb.Source.Config
 ---@return omb.Source
-function Source:new(config)
+function Source:new(config, parent_id)
     ---@type omb.Source
     local source = {
+        parent_id = parent_id,
+        id = core.next_id(),
         provider = config.provider,
         sorter = config.sorter or function(ctx)
             return ctx.list
@@ -59,13 +64,11 @@ function Source:new(config)
     return setmetatable(source, { __index = self })
 end
 
-function Source:_insert_fmt_pair(f, h)
-    table.insert(self.ctx.formatted, f)
-    table.insert(self.ctx.highlights, h)
-end
-
----@param fmt_items omb.Source.FmtItem[]
+---@param fmt_items omb.Source.FmtItem[]|string
 function Source:_fmt_items_to_pair(fmt_items)
+    if type(fmt_items) == "string" then
+        return fmt_items, {}
+    end
     local text = ""
     local hl_ranges = {}
     local curr_col = 0
@@ -77,11 +80,16 @@ function Source:_fmt_items_to_pair(fmt_items)
         elseif type(fmt_item) == "table" and #fmt_item[1] > 0 then
             -- fmt_item: [text, hl group]
             text = text .. fmt_item[1]
-            table.insert(hl_ranges, { curr_col, curr_col + #fmt_item[1], fmt_item[2] }) -- start, end, hl
+            table.insert(hl_ranges, { curr_col, curr_col + #fmt_item[1], fmt_item[2] }) -- start, end, hl group
         end
         curr_col = #text
     end
     return text, hl_ranges
+end
+
+---@param parent_id integer
+function Source:set_parent(parent_id)
+    self.parent_id = parent_id
 end
 
 ---@return table
@@ -98,12 +106,9 @@ function Source:update()
     ctx.highlights = {}
     for i, item in ipairs(ctx.list) do
         local fmt_items = self.format({ item = item, index = i }, user_data)
-        if type(fmt_items) == "string" then
-            self:_insert_fmt_pair(fmt_items, vim.NIL)
-        elseif type(fmt_items) == "table" then
-            local text, hls = self:_fmt_items_to_pair(fmt_items)
-            self:_insert_fmt_pair(text, hls)
-        end
+        local text, hls = self:_fmt_items_to_pair(fmt_items)
+        ctx.formatted[i] = text
+        ctx.highlights[i] = hls
     end
     ctx.keys = self.assigner(ctx, user_data)
 
@@ -115,9 +120,9 @@ function Source:update()
     return user_data
 end
 
----@return string[] keys, string[] items
+---@return string[] keys, string[] items,
 function Source:get_formatted_list()
-    return self.ctx.keys, self.ctx.formatted
+    return self.ctx.keys, self.ctx.formatted, self.ctx.highlights
 end
 
 return Source
