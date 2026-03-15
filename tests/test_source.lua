@@ -4,14 +4,23 @@ local T = MiniTest.new_set()
 
 T["get_formatted_list"] = function()
     local expected = {
-        { "a", "1" },
-        { "b", "2" },
-        { "c", "3" },
-        { "d", "4" },
+        -- key, item, hls (hl: start, end (0-based, end-exclusive), hl group)
+        { "a", "1", {} },
+        { "b", "2", { { 0, 1, "Comment" } } },
+        { "c", "3", { { 0, 1, "Special" } } },
+        { "d", "4", {} },
     }
     local source = M:new({
         provider = function()
             return { 1, 2, 3, 4 }
+        end,
+        format = function(ctx)
+            if ctx.item == 2 then
+                return { { "2", "Comment" } }
+            elseif ctx.item == 3 then
+                return { { "3", "Special" } }
+            end
+            return tostring(ctx.item)
         end,
         assigner = function()
             return { "a", "b", "c", "d" }
@@ -19,9 +28,9 @@ T["get_formatted_list"] = function()
     })
     source:update()
 
-    local keys, items = source:get_formatted_list()
-    for i, key, item in require("omb.utils").zip_iter(keys, items) do
-        h.eq(expected[i], { key, item })
+    local keys, items, hls = source:get_formatted_list()
+    for i, key, item, hl in require("omb.utils").zip_iter3(keys, items, hls) do
+        h.eq(expected[i], { key, item, hl })
     end
 end
 T["format function"] = function()

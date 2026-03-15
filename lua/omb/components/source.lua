@@ -120,7 +120,7 @@ function Source:update()
     return user_data
 end
 
----@return string[] keys, string[] items,
+---@return string[] keys, string[] items, omb.Source.Highlight[] highlights
 function Source:get_formatted_list()
     return self.ctx.keys, self.ctx.formatted, self.ctx.highlights
 end
