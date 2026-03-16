@@ -7,7 +7,7 @@ X REDESIGN SOURCE ASSIGNER, ADD SOURCE SORTER
     Conciderations:
         - Unlike before, validation will be required to ensure no key name conflicts
 
-- MERGE DRAWER HIGHLIGHT SUBCOMPONENT INTO SOURCE FORMATTER
+X MERGE DRAWER HIGHLIGHT SUBCOMPONENT INTO SOURCE FORMATTER
     * Simplifies highlight system and drawer component *
     Remove highlight subcomponent and instead expand functionallity of source formatter.
     Although unsure, formatter could return list of text chunks paired with highlight group. Texts will be concatinated to create an item. Highlights will be used by drawer. System was inspired by API of neovim itself.

@@ -1,14 +1,11 @@
 local core = require("omb.core")
 local utils = require("omb.utils")
 
----@alias omb.Drawer.Highlight fun(ctx: omb.Drawer.HighlighterContext, my: table): hl_ranges: omb.Drawer.HlRange[]|string
----@alias omb.Drawer.HlRange {start_col?: uinteger, end_col?: uinteger, hl: string} start and end are 0-based, end-exclusive
 ---@alias omb.Drawer.Pos "top_left"|"top_center"|"top_right"|"center_left"|"center_center"|"center_right"|"bottom_left"|"bottom_center"|"bottom_right"
 ---@alias omb.Drawer.Size number|"flex"|{min?: number, max?: number}
 
 ---@class omb.Drawer.Config
 ---@field key_separator? string
----@field highlight? omb.Drawer.Highlight
 ---@field pos? omb.Drawer.Pos
 ---@field width? omb.Drawer.Size
 ---@field height? omb.Drawer.Size
@@ -25,19 +22,20 @@ local utils = require("omb.utils")
 
 ---@class omb.Drawer
 ---@field key_separator string
----@field highlight omb.Drawer.Highlight
 ---@field ns number
----@field state omb.Drawer.State
 ---@field xpos "left"|"right"|"center"
 ---@field ypos "top"|"bottom"|"center"
 ---@field width omb.Drawer.Size
 ---@field height omb.Drawer.Size
 ---@field extends_char string
+---@field id integer
+---@field parent_id integer
+---@field state omb.Drawer.State
 local Drawer = {}
 
 ---@param config omb.Drawer.Config
 ---@return omb.Drawer
-function Drawer:new(config)
+function Drawer:new(config, parent_id)
     local width, height = config.width or "flex", config.height or "flex"
     if type(width) == "number" then
         width = utils.resolve_width(width)
@@ -49,10 +47,9 @@ function Drawer:new(config)
 
     ---@type omb.Drawer
     local drawer = {
+        id = core.next_id(),
+        parent_id = parent_id,
         key_separator = config.key_separator or " | ",
-        highlight = config.highlight or function()
-            return {}
-        end,
         xpos = xpos,
         ypos = ypos,
         width = width,
@@ -68,9 +65,9 @@ function Drawer:new(config)
     return setmetatable(drawer, { __index = self })
 end
 
+---fails if update wasn't called as max_width/height are invalid
 ---@return integer row, integer col, integer width, integer height, string anchor
 function Drawer:_get_rect()
-    -- fails if update wasn't called as max_width/height are invalid
     local width, height = self.width, self.height
     if width == "flex" then
         width = self.state.max_width
@@ -109,11 +106,14 @@ function Drawer:_get_rect()
     return row, col, width, height, yanchor .. xanchor
 end
 
----@param keys string[]
----@param items string[]
----@param user_data table
+---@param parent_id integer
+function Drawer:set_parent(parent_id)
+    self.parent_id = parent_id
+end
+
+---@param source_ctx omb.Source.FullContext
 ---@return table user_data
-function Drawer:update(keys, items, user_data)
+function Drawer:update(source_ctx)
     if not vim.api.nvim_buf_is_valid(self.state.buf) then
         self.state.buf = vim.api.nvim_create_buf(false, true)
         assert(self.state.buf ~= 0, "couldn't create buffer")
