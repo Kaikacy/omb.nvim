@@ -10,7 +10,7 @@ T["get_formatted_list"] = function()
         { "c", "3", { { 0, 1, "Special" } } },
         { "d", "4", {} },
     }
-    local source = M:new({
+    local source = M.new({
         provider = function()
             return { 1, 2, 3, 4 }
         end,
@@ -42,7 +42,7 @@ T["format function"] = function()
         { "4", "abcdef", { { 0, 4, "Special" }, { 4, 6, "Comment" } } },
         { "5", "abcdef", { { 0, 4, "Special" }, { 4, 6, "Comment" } } },
     }
-    local source = M:new({
+    local source = M.new({
         provider = function()
             return { 1, 2, 3, 4, 5 }
         end,
