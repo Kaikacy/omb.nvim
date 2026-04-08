@@ -1,12 +1,39 @@
+local core = require("omb.core")
+
 local M = {}
 
----@param source_cfg omb.Source.Config
----@param drawer_cfg omb.Drawer.Config
----@param handler_cfg omb.Handler.Config
----@return omb.Selector
--- TODO:
-function M.selector(source_cfg, drawer_cfg, handler_cfg)
-    return require("omb.selector"):new(source_cfg, drawer_cfg, handler_cfg)
+---@param config omb.Source.Config
+---@return integer id
+function M.new_source(config)
+    local source = require("omb.components.source").new(config)
+    core.register_component(source)
+    return source.base.id
+end
+
+---@param config omb.Drawer.Config
+---@return integer id
+function M.new_drawer(config)
+    local drawer = require("omb.components.drawer").new(config)
+    core.register_component(drawer)
+    return drawer.base.id
+end
+
+---@param config omb.Handler.Config
+---@return integer id
+function M.new_handler(config)
+    local handler = require("omb.components.handler").new(config)
+    core.register_component(handler)
+    return handler.id
+end
+
+---@param source_id integer
+---@param drawer_id integer
+---@param handler_id integer
+---@return integer id
+function M.new_selector(source_id, drawer_id, handler_id)
+    local selector = require("omb.selector").new(source_id, drawer_id, handler_id)
+    core.register_selector(selector)
+    return selector.id
 end
 
 return M
