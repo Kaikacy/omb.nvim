@@ -111,7 +111,7 @@ function Display:update()
     end
     local buf = self.state.buf
 
-    local keys, items, highlights = self.base:parent():get_child_source():get_formatted_list()
+    local keys, items, highlights = self.base:get_parent():get_child_source():get_formatted_list()
 
     local lines = {}
     for _, key, item in utils.zip_iter(keys, items) do
@@ -144,7 +144,7 @@ function Display:update()
     end
 end
 
-function Display:display()
+function Display:show()
     assert(not vim.api.nvim_win_is_valid(core.state.win), "another display is active")
     assert(vim.api.nvim_buf_is_valid(self.state.buf), "buffer isn't valid")
 

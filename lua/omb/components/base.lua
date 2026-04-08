@@ -14,7 +14,7 @@ function Base.new()
     return setmetatable(base, { __index = Base })
 end
 
-function Base:parent()
+function Base:get_parent()
     return core.get_selector(self.parent_id)
 end
 
