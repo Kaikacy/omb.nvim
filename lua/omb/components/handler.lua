@@ -18,7 +18,7 @@ local utils = require("omb.utils")
 local Handler = {}
 
 ---@param config omb.Handler.Config
-function Handler:new(config)
+function Handler.new(config)
     local cancel_keys = config.cancel_key or { "<esc>" }
     if type(cancel_keys) == "string" then
         cancel_keys = { cancel_keys }
@@ -28,7 +28,7 @@ function Handler:new(config)
         action = config.action,
         cancel_keys = cancel_keys,
     }
-    return setmetatable(handler, { __index = self })
+    return setmetatable(handler, { __index = Handler })
 end
 
 ---@param keys string[]

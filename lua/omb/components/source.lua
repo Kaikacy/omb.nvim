@@ -1,5 +1,4 @@
 local utils = require("omb.utils")
-local core = require("omb.core")
 
 ---@alias omb.Source.Provider fun(ctx: omb.Source.ProviderContext, my: table): list: any[]
 ---@alias omb.Source.Sorter fun(ctx: omb.Source.SorterContext, my: table): sorted: any[]
@@ -35,22 +34,20 @@ local core = require("omb.core")
 ---@field index integer
 
 ---@class omb.Source
+---@field base omb.BaseComponent
 ---@field provider omb.Source.Provider
 ---@field sorter omb.Source.Sorter
 ---@field format omb.Source.Format
 ---@field assigner omb.Source.Assigner
----@field id integer
----@field parent_id integer
 ---@field ctx omb.Source.PartialContext|omb.Source.FullContext
 local Source = {}
 
 ---@param config omb.Source.Config
 ---@return omb.Source
-function Source:new(config)
+function Source.new(config)
     ---@type omb.Source
     local source = {
-        parent_id = -1,
-        id = core.next_id(),
+        base = require("omb.components.base").new(),
         provider = config.provider,
         sorter = config.sorter or function(ctx)
             return ctx.list
@@ -61,7 +58,7 @@ function Source:new(config)
         assigner = config.assigner,
         ctx = {},
     }
-    return setmetatable(source, { __index = self })
+    return setmetatable(source, { __index = Source })
 end
 
 ---@param fmt_items omb.Source.FmtItem[]|string

@@ -8,9 +8,8 @@ local core = require("omb.core")
 local Selector = {}
 
 ---@return omb.Selector
-function Selector:new(source_id, drawer_id, handler_id)
+function Selector.new(source_id, drawer_id, handler_id)
     local id = core.next_id()
-    ---@diagnostic disable-next-line: missing-fields
     ---@type omb.Selector
     local selector = {
         id = id,

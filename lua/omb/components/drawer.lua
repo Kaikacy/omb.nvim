@@ -21,6 +21,7 @@ local utils = require("omb.utils")
 ---@field max_height integer
 
 ---@class omb.Drawer
+---@field base omb.BaseComponent
 ---@field key_separator string
 ---@field ns number
 ---@field xpos "left"|"right"|"center"
@@ -28,14 +29,12 @@ local utils = require("omb.utils")
 ---@field width omb.Drawer.Size
 ---@field height omb.Drawer.Size
 ---@field extends_char string
----@field id integer
----@field parent_id integer
 ---@field state omb.Drawer.State
 local Drawer = {}
 
 ---@param config omb.Drawer.Config
 ---@return omb.Drawer
-function Drawer:new(config)
+function Drawer.new(config)
     local width, height = config.width or "flex", config.height or "flex"
     if type(width) == "number" then
         width = utils.resolve_width(width)
@@ -45,11 +44,9 @@ function Drawer:new(config)
     end
     local ypos, xpos = unpack(vim.fn.split(config.pos or "center_center", "_"))
 
-    ---@diagnostic disable-next-line: missing-fields
     ---@type omb.Drawer
     local drawer = {
-        id = core.next_id(),
-        parent_id = -1,
+        base = require("omb.components.base").new(),
         key_separator = config.key_separator or " | ",
         xpos = xpos,
         ypos = ypos,
@@ -63,7 +60,7 @@ function Drawer:new(config)
             max_height = -1,
         },
     }
-    return setmetatable(drawer, { __index = self })
+    return setmetatable(drawer, { __index = Drawer })
 end
 
 ---fails if update wasn't called as max_width/height are invalid
@@ -114,7 +111,7 @@ function Drawer:update()
     end
     local buf = self.state.buf
 
-    local keys, items, highlights = core.get_selector(self.parent_id):get_child_source():get_formatted_list()
+    local keys, items, highlights = self.base:parent():get_child_source():get_formatted_list()
 
     local lines = {}
     for _, key, item in utils.zip_iter(keys, items) do
