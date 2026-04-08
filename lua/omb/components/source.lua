@@ -46,10 +46,10 @@ local Source = {}
 
 ---@param config omb.Source.Config
 ---@return omb.Source
-function Source:new(config, parent_id)
+function Source:new(config)
     ---@type omb.Source
     local source = {
-        parent_id = parent_id,
+        parent_id = -1,
         id = core.next_id(),
         provider = config.provider,
         sorter = config.sorter or function(ctx)
@@ -85,11 +85,6 @@ function Source:_fmt_items_to_pair(fmt_items)
         curr_col = #text
     end
     return text, hl_ranges
-end
-
----@param parent_id integer
-function Source:set_parent(parent_id)
-    self.parent_id = parent_id
 end
 
 ---@return table

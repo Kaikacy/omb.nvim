@@ -35,7 +35,7 @@ local Drawer = {}
 
 ---@param config omb.Drawer.Config
 ---@return omb.Drawer
-function Drawer:new(config, parent_id)
+function Drawer:new(config)
     local width, height = config.width or "flex", config.height or "flex"
     if type(width) == "number" then
         width = utils.resolve_width(width)
@@ -45,10 +45,11 @@ function Drawer:new(config, parent_id)
     end
     local ypos, xpos = unpack(vim.fn.split(config.pos or "center_center", "_"))
 
+    ---@diagnostic disable-next-line: missing-fields
     ---@type omb.Drawer
     local drawer = {
         id = core.next_id(),
-        parent_id = parent_id,
+        parent_id = -1,
         key_separator = config.key_separator or " | ",
         xpos = xpos,
         ypos = ypos,
@@ -106,19 +107,14 @@ function Drawer:_get_rect()
     return row, col, width, height, yanchor .. xanchor
 end
 
----@param parent_id integer
-function Drawer:set_parent(parent_id)
-    self.parent_id = parent_id
-end
-
----@param source_ctx omb.Source.FullContext
----@return table user_data
-function Drawer:update(source_ctx)
+function Drawer:update()
     if not vim.api.nvim_buf_is_valid(self.state.buf) then
         self.state.buf = vim.api.nvim_create_buf(false, true)
         assert(self.state.buf ~= 0, "couldn't create buffer")
     end
     local buf = self.state.buf
+
+    local keys, items, highlights = core.get_selector(self.parent_id):get_child_source():get_formatted_list()
 
     local lines = {}
     for _, key, item in utils.zip_iter(keys, items) do
@@ -134,34 +130,21 @@ function Drawer:update(source_ctx)
     vim.api.nvim_buf_clear_namespace(buf, self.ns, 0, -1)
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, {})
 
+    -- display lines
     vim.api.nvim_buf_set_lines(buf, 0, #lines, false, lines)
 
-    for i, key, item in utils.zip_iter(keys, items) do
-        local hl_ranges = self.highlight({ item = item, key = key }, user_data)
+    for i, key, hl_ranges in utils.zip_iter(keys, highlights) do
         local item_start = #key + #self.key_separator
-        if hl_ranges == "string" then
-            -- full line, excluding key and separator
+        for _, hl_range in ipairs(hl_ranges) do
             vim.api.nvim_buf_set_extmark(
                 buf,
                 self.ns,
                 i - 1, -- 0-based
-                item_start,
-                { end_col = -1, hl_group = hl_ranges }
+                hl_range[1] + item_start,
+                { end_col = hl_range[2] + item_start, hl_group = hl_range[3] }
             )
-        elseif type(hl_ranges) == "table" then
-            -- actual range
-            for _, hl_range in ipairs(hl_ranges) do
-                vim.api.nvim_buf_set_extmark(
-                    buf,
-                    self.ns,
-                    i - 1, -- 0-based
-                    hl_range.start_col + item_start,
-                    { end_col = hl_range.end_col + item_start, hl_group = hl_range.hl }
-                )
-            end
         end
     end
-    return user_data
 end
 
 function Drawer:display()
