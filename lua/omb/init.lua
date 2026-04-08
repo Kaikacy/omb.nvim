@@ -10,12 +10,12 @@ function M.new_source(config)
     return source.base.id
 end
 
----@param config omb.Drawer.Config
+---@param config omb.Display.Config
 ---@return integer id
-function M.new_drawer(config)
-    local drawer = require("omb.components.drawer").new(config)
-    core.register_component(drawer)
-    return drawer.base.id
+function M.new_display(config)
+    local display = require("omb.components.display").new(config)
+    core.register_component(display)
+    return display.base.id
 end
 
 ---@param config omb.Handler.Config
@@ -27,11 +27,11 @@ function M.new_handler(config)
 end
 
 ---@param source_id integer
----@param drawer_id integer
+---@param display_id integer
 ---@param handler_id integer
 ---@return integer id
-function M.new_selector(source_id, drawer_id, handler_id)
-    local selector = require("omb.selector").new(source_id, drawer_id, handler_id)
+function M.new_selector(source_id, display_id, handler_id)
+    local selector = require("omb.selector").new(source_id, display_id, handler_id)
     core.register_selector(selector)
     return selector.id
 end

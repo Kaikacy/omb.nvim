@@ -33,7 +33,7 @@ GENERATING DATA
 
 DRAWING
       +-------------+
-      | drawer mode | (determined by higher level; probably user)
+      | display mode | (determined by higher level; probably user)
       +-------------+
         V         V
 +-----------+  +--------+     +--------+      +-------------+

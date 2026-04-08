@@ -1,40 +1,40 @@
 local core = require("omb.core")
 local utils = require("omb.utils")
 
----@alias omb.Drawer.Pos "top_left"|"top_center"|"top_right"|"center_left"|"center_center"|"center_right"|"bottom_left"|"bottom_center"|"bottom_right"
----@alias omb.Drawer.Size number|"flex"|{min?: number, max?: number}
+---@alias omb.Display.Pos "top_left"|"top_center"|"top_right"|"center_left"|"center_center"|"center_right"|"bottom_left"|"bottom_center"|"bottom_right"
+---@alias omb.Display.Size number|"flex"|{min?: number, max?: number}
 
----@class omb.Drawer.Config
+---@class omb.Display.Config
 ---@field key_separator? string
----@field pos? omb.Drawer.Pos
----@field width? omb.Drawer.Size
----@field height? omb.Drawer.Size
+---@field pos? omb.Display.Pos
+---@field width? omb.Display.Size
+---@field height? omb.Display.Size
 ---@field extends_char? string
 
----@class omb.Drawer.HighlighterContext
+---@class omb.Display.HighlighterContext
 ---@field item string
 ---@field key string
 
----@class omb.Drawer.State
+---@class omb.Display.State
 ---@field buf integer
 ---@field max_width integer
 ---@field max_height integer
 
----@class omb.Drawer
+---@class omb.Display
 ---@field base omb.BaseComponent
 ---@field key_separator string
 ---@field ns number
 ---@field xpos "left"|"right"|"center"
 ---@field ypos "top"|"bottom"|"center"
----@field width omb.Drawer.Size
----@field height omb.Drawer.Size
+---@field width omb.Display.Size
+---@field height omb.Display.Size
 ---@field extends_char string
----@field state omb.Drawer.State
-local Drawer = {}
+---@field state omb.Display.State
+local Display = {}
 
----@param config omb.Drawer.Config
----@return omb.Drawer
-function Drawer.new(config)
+---@param config omb.Display.Config
+---@return omb.Display
+function Display.new(config)
     local width, height = config.width or "flex", config.height or "flex"
     if type(width) == "number" then
         width = utils.resolve_width(width)
@@ -44,8 +44,8 @@ function Drawer.new(config)
     end
     local ypos, xpos = unpack(vim.fn.split(config.pos or "center_center", "_"))
 
-    ---@type omb.Drawer
-    local drawer = {
+    ---@type omb.Display
+    local display = {
         base = require("omb.components.base").new(),
         key_separator = config.key_separator or " | ",
         xpos = xpos,
@@ -60,12 +60,12 @@ function Drawer.new(config)
             max_height = -1,
         },
     }
-    return setmetatable(drawer, { __index = Drawer })
+    return setmetatable(display, { __index = Display })
 end
 
 ---fails if update wasn't called as max_width/height are invalid
 ---@return integer row, integer col, integer width, integer height, string anchor
-function Drawer:_get_rect()
+function Display:_get_rect()
     local width, height = self.width, self.height
     if width == "flex" then
         width = self.state.max_width
@@ -104,7 +104,7 @@ function Drawer:_get_rect()
     return row, col, width, height, yanchor .. xanchor
 end
 
-function Drawer:update()
+function Display:update()
     if not vim.api.nvim_buf_is_valid(self.state.buf) then
         self.state.buf = vim.api.nvim_create_buf(false, true)
         assert(self.state.buf ~= 0, "couldn't create buffer")
@@ -144,8 +144,8 @@ function Drawer:update()
     end
 end
 
-function Drawer:display()
-    assert(not vim.api.nvim_win_is_valid(core.state.win), "another drawer is active")
+function Display:display()
+    assert(not vim.api.nvim_win_is_valid(core.state.win), "another display is active")
     assert(vim.api.nvim_buf_is_valid(self.state.buf), "buffer isn't valid")
 
     local row, col, width, height, anchor = self:_get_rect()
@@ -167,9 +167,9 @@ function Drawer:display()
     core.state.win = win
 end
 
-function Drawer:hide()
+function Display:hide()
     assert(vim.api.nvim_win_is_valid(core.state.win), "window should be open before calling close")
     vim.api.nvim_win_hide(core.state.win)
 end
 
-return Drawer
+return Display

@@ -15,7 +15,7 @@ local handlers = require("omb.builtin").handlers
 local buf_source = {
     -- `ctx` will contains info like raw list, formatted list... (for provider function, it's empty)
     -- `my` is a shared RW table, for passing data from top to bottom, throughout the whole pipeline
-    -- this way different components (and subcomponents) can communicate, one way (source -> drawer -> handler)
+    -- this way different components (and subcomponents) can communicate, one way (source -> display -> handler)
     -- nothing will ever touch it, it's soley for the user
     provider = function(ctx, my)
         _ = ctx
@@ -43,8 +43,8 @@ local buf_source = {
     end,
 }
 
----@type omb.Drawer.Config
-local generic_drawer = {
+---@type omb.Display.Config
+local generic_display = {
     key_separator = " | ",
     -- smart position parsing, allows 8 general direction and center_center is the default
     pos = "center_right",
@@ -97,5 +97,5 @@ local generic_handler = {
     end,
 }
 
-local buf_switcher = omb.selector(buf_source, generic_drawer, generic_handler)
+local buf_switcher = omb.selector(buf_source, generic_display, generic_handler)
 buf_switcher:run({ hidden = true }) -- content of `my` table when starting up

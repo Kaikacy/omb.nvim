@@ -2,23 +2,23 @@ local core = require("omb.core")
 
 ---@class omb.Selector
 ---@field source_id integer
----@field drawer_id integer
+---@field display_id integer
 ---@field handler_id integer
 ---@field id integer
 local Selector = {}
 
 ---@return omb.Selector
-function Selector.new(source_id, drawer_id, handler_id)
+function Selector.new(source_id, display_id, handler_id)
     local id = core.next_id()
     ---@type omb.Selector
     local selector = {
         id = id,
         source_id = source_id,
-        drawer_id = drawer_id,
+        display_id = display_id,
         handler_id = handler_id,
     }
     core.set_component_parent(source_id, id)
-    core.set_component_parent(drawer_id, id)
+    core.set_component_parent(display_id, id)
     core.set_component_parent(handler_id, id)
 
     return setmetatable(selector, { __index = Selector })
@@ -29,9 +29,9 @@ function Selector:get_child_source()
     return core.get_component(self.source_id)
 end
 
-function Selector:get_child_drawer()
-    ---@type omb.Drawer
-    return core.get_component(self.drawer_id)
+function Selector:get_child_display()
+    ---@type omb.Display
+    return core.get_component(self.display_id)
 end
 
 function Selector:get_child_handler()

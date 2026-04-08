@@ -1,4 +1,4 @@
----@alias omb.Component omb.Source|omb.Drawer|omb.Handler
+---@alias omb.Component omb.Source|omb.Display|omb.Handler
 
 local M = {}
 
@@ -13,7 +13,7 @@ local M = {}
 ---@type omb.State
 local state = {
     win = -1,
-    ns = vim.api.nvim_create_namespace("omb-drawer"),
+    ns = vim.api.nvim_create_namespace("omb-display"),
     selectors = {},
     components = {},
     safe_id = 0, -- unique id; shall be used for everything
@@ -40,7 +40,7 @@ end
 
 ---@param component omb.Component
 function M.register_component(component)
-    state.components[component.id] = component
+    state.components[component.base.id] = component
 end
 
 ---@param id integer
@@ -52,7 +52,7 @@ end
 ---@param component_id integer
 ---@param parent_id integer
 function M.set_component_parent(component_id, parent_id)
-    state.components[component_id].parent_id = parent_id
+    state.components[component_id].base.parent_id = parent_id
 end
 
 return M
