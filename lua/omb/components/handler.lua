@@ -13,6 +13,7 @@ local utils = require("omb.utils")
 ---@field action omb.Handler.Action
 
 ---@class omb.Handler
+---@field base omb.BaseComponent
 ---@field action omb.Handler.Action
 ---@field cancel_keys string[]
 local Handler = {}
@@ -25,6 +26,7 @@ function Handler.new(config)
     end
     ---@type omb.Handler
     local handler = {
+        base = require("omb.components.base").new(),
         action = config.action,
         cancel_keys = cancel_keys,
     }
