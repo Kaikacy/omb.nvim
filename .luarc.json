@@ -1,10 +1,10 @@
 {
     "runtime": {
-        "version": "LuaJIT"
+        "version": "LuaJIT",
     },
     "workspace": {
         "checkThirdParty": false,
-        "library": [ "${env:VIMRUNTIME}/lua", "${workspaceFolder}/lua" ]
+        "library": [ "$VIMRUNTIME/lua", "${workspaceFolder}/lua" ]
     },
     "diagnostics.globals": [
         "MiniTest"

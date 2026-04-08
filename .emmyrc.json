@@ -1,0 +1,9 @@
+{
+    "runtime": {
+        "version": "LuaJIT",
+        "requirePattern": [ "?.lua", "?/init.lua" ]
+    },
+    "workspace": {
+        "library": [ "$VIMRUNTIME", "${workspaceFolder}/lua" ]
+    }
+}
