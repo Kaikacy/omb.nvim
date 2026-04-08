@@ -21,10 +21,10 @@ local utils = require("omb.utils")
 
 ---@class omb.Source.SorterContext: omb.Source.ProviderContext
 ---@field list any[]
-
----@class omb.Source.AssignerContext: omb.Source.SorterContext
 ---@field formatted string[]
 ---@field highlights omb.Source.Highlight[]
+
+---@class omb.Source.AssignerContext: omb.Source.SorterContext
 
 ---@class omb.Source.FullContext: omb.Source.AssignerContext
 ---@field keys string[]
@@ -49,11 +49,11 @@ function Source.new(config)
     local source = {
         base = require("omb.components.base").new(),
         provider = config.provider,
-        sorter = config.sorter or function(ctx)
-            return ctx.list
-        end,
         format = config.format or function(ctx)
             return tostring(ctx.item)
+        end,
+        sorter = config.sorter or function(ctx)
+            return ctx.list
         end,
         assigner = config.assigner,
         ctx = {},
@@ -93,7 +93,6 @@ function Source:update()
     local user_data = {}
 
     ctx.list = self.provider(ctx, user_data)
-    ctx.list = self.sorter(ctx, user_data)
     ctx.formatted = {}
     ctx.highlights = {}
     for i, item in ipairs(ctx.list) do
@@ -102,6 +101,7 @@ function Source:update()
         ctx.formatted[i] = text
         ctx.highlights[i] = hls
     end
+    ctx.list = self.sorter(ctx, user_data)
     ctx.keys = self.assigner(ctx, user_data)
 
     assert(#ctx.keys > 0, "no keys assigned in source")
