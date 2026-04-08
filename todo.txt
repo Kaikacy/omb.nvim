@@ -24,7 +24,7 @@ X REPLACE SOURCE FORMATTER WITH FORMAT ITERATOR
 - FINISH HANDLING SYSTEM AND HANDLER COMPONENT
     * Makes handler component much more powerful *
     On top of user interaction, any other component error will be redirected to handler. Error handling will be fully cusomizable. As lua does not have error handling system, error codes will be used.
-    Although Unsure, custom action might not be specifiable, instead after successful selection handler will return information about selected item
+    Although unsure, custom action might not be specifiable, instead, after successful selection handler will return information about selected item.
     If desired by user, any untrusted function could be run in protected mode
 
 - ADD ID SYSTEM FOR EVERY COMPONENT AND SELECTOR
