@@ -1,5 +1,6 @@
 local H = {}
 
+---@return unknown T, unknown child
 function H.test_set_with_child(module)
     local child = MiniTest.new_child_neovim()
     local T = MiniTest.new_set({
