@@ -27,7 +27,7 @@ X REPLACE SOURCE FORMATTER WITH FORMAT ITERATOR
     Although unsure, custom action might not be specifiable, instead, after successful selection handler will return information about selected item.
     If desired by user, any untrusted function could be run in protected mode
 
-- ADD ID SYSTEM FOR EVERY COMPONENT AND SELECTOR
+X ADD ID SYSTEM FOR EVERY COMPONENT AND SELECTOR
     * Gives users much more flexibility and improves DX *
     Every component and selector will have unique id, internally represented by hex string.
     Actual component table will be stored in shared state; Users will interact with it using provided API, similar to neovim's system.
