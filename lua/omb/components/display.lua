@@ -70,12 +70,12 @@ function Display:_get_rect()
     if width == "flex" then
         width = self.state.max_width
     elseif type(width) == "table" then
-        width = utils.resolve_width(utils.clamp(self.state.max_width, width.min or 0, width.max or 1))
+        width = utils.clamp_width(self.state.max_width, width.min or 0, width.max or 1)
     end
     if height == "flex" then
         height = self.state.max_height
     elseif type(height) == "table" then
-        height = utils.resolve_height(utils.clamp(self.state.max_height, height.min or 0, height.max or 1))
+        height = utils.clamp_height(self.state.max_height, height.min or 0, height.max or 1)
     end
     ---@cast width integer
     ---@cast height integer
@@ -104,17 +104,16 @@ function Display:_get_rect()
     return row, col, width, height, yanchor .. xanchor
 end
 
-function Display:update()
+---@param source_ctx omb.Source.FullContext
+function Display:update(source_ctx)
     if not vim.api.nvim_buf_is_valid(self.state.buf) then
         self.state.buf = vim.api.nvim_create_buf(false, true)
         assert(self.state.buf ~= 0, "couldn't create buffer")
     end
     local buf = self.state.buf
 
-    local keys, items, highlights = self.base:get_parent():get_child_source():get_formatted_list()
-
     local lines = {}
-    for _, key, item in utils.zip_iter(keys, items) do
+    for _, key, item in utils.zip_iter(source_ctx.keys, source_ctx.formatted) do
         local line = key .. self.key_separator .. item
         table.insert(lines, line)
         if self.state.max_width < #line then
@@ -130,7 +129,7 @@ function Display:update()
     -- display lines
     vim.api.nvim_buf_set_lines(buf, 0, #lines, false, lines)
 
-    for i, key, hl_ranges in utils.zip_iter(keys, highlights) do
+    for i, key, hl_ranges in utils.zip_iter(source_ctx.keys, source_ctx.highlights) do
         local item_start = #key + #self.key_separator
         for _, hl_range in ipairs(hl_ranges) do
             vim.api.nvim_buf_set_extmark(

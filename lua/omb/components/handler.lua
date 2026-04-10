@@ -1,16 +1,16 @@
 local utils = require("omb.utils")
----
----@alias omb.Handler.Action fun(ctx: omb.Handler.ActionContext, my: table)
+
+---@alias omb.Handler.Action fun(ctx: omb.Handler.ActionContext): any
 
 ---@class omb.Handler.ActionContext
 ---@field key string
+---@field item any
 ---@field formatted string
-----@field item any
 ---@field index integer
 
 ---@class omb.Handler.Config
 ---@field cancel_key? string|string[]
----@field action omb.Handler.Action
+---@field action? omb.Handler.Action
 
 ---@class omb.Handler
 ---@field base omb.BaseComponent
@@ -20,36 +20,40 @@ local Handler = {}
 
 ---@param config omb.Handler.Config
 function Handler.new(config)
-    local cancel_keys = config.cancel_key or { "<esc>" }
-    if type(cancel_keys) == "string" then
-        cancel_keys = { cancel_keys }
+    local cancel_keys = { "" } -- <ESC>
+    if type(config.cancel_key) == "string" then
+        cancel_keys = { vim.keycode(config.cancel_key) }
+    elseif type(config.cancel_key) == "table" then
+        cancel_keys = vim.tbl_map(function(key)
+            return vim.keycode(key)
+        end, config.cancel_key)
     end
     ---@type omb.Handler
     local handler = {
         base = require("omb.components.base").new(),
-        action = config.action,
+        action = config.action or function(ctx)
+            return ctx
+        end,
         cancel_keys = cancel_keys,
     }
     return setmetatable(handler, { __index = Handler })
 end
 
----@param keys string[]
----@param items string[]
----@param user_data table
-function Handler:run(keys, items, user_data)
+---@param source_ctx omb.Source.FullContext
+---@return omb.Handler.ActionContext?
+function Handler:run(source_ctx)
     -- TODO: catch interupt (<C-c>)
-    -- TODO: case-sensitivity (configurable)
-    -- TODO: instead of calling action directly, defer it at the end of selector (maybe configurable)
     local char = vim.fn.getcharstr(-1, { cursor = "keep" })
-    for _, key in ipairs(self.cancel_keys) do
-        if char == vim.api.nvim_replace_termcodes(key, true, true, true) then
+
+    for _, cancel_key in ipairs(self.cancel_keys) do
+        if char == cancel_key then
             return
         end
     end
-    for i, key, item in utils.zip_iter(keys, items) do
-        if char == key:lower() then
-            self.action({ key = key, formatted = item, index = i }, user_data)
-            return
+
+    for i, key, item, formatted in utils.zip_iter3(source_ctx.keys, source_ctx.list, source_ctx.formatted) do
+        if char == vim.keycode(key) then
+            return self.action({ key = key, item = item, formatted = formatted, index = i })
         end
     end
     -- error("input char isn't assigned to item")

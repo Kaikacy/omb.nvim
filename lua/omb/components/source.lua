@@ -75,6 +75,7 @@ function Source:_fmt_items_to_pair(fmt_items)
             -- no need to insert anything in hl_ranges
             text = text .. fmt_item
         elseif type(fmt_item) == "table" and #fmt_item[1] > 0 then
+            assert(#fmt_item == 2, "invalid fmt_item")
             -- fmt_item: [text, hl group]
             text = text .. fmt_item[1]
             table.insert(hl_ranges, { curr_col, curr_col + #fmt_item[1], fmt_item[2] }) -- start, end, hl group
@@ -84,13 +85,12 @@ function Source:_fmt_items_to_pair(fmt_items)
     return text, hl_ranges
 end
 
----@return table
-function Source:update()
+---@param user_data table
+function Source:update(user_data)
     -- ctx is reference to self.ctx, they point to same data
     -- similarly, user_data table is passed by reference, unless if it's reassigned in user function, then it gets copied
     local ctx = self.ctx
     ---@cast ctx omb.Source.FullContext
-    local user_data = {}
 
     ctx.list = self.provider(ctx, user_data)
     ctx.formatted = {}
@@ -108,13 +108,6 @@ function Source:update()
     assert(#ctx.list == #ctx.keys, "sorted items and keys length don't match")
 
     assert(utils.get_first_dup(ctx.keys) == nil, "duplicate key")
-
-    return user_data
-end
-
----@return string[] keys, string[] items, omb.Source.Highlight[] highlights
-function Source:get_formatted_list()
-    return self.ctx.keys, self.ctx.formatted, self.ctx.highlights
 end
 
 return Source

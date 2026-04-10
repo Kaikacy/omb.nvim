@@ -23,7 +23,7 @@ end
 function M.new_handler(config)
     local handler = require("omb.components.handler").new(config)
     core.register_component(handler)
-    return handler.id
+    return handler.base.id
 end
 
 ---@param source_id integer
@@ -34,6 +34,12 @@ function M.new_selector(source_id, display_id, handler_id)
     local selector = require("omb.selector").new(source_id, display_id, handler_id)
     core.register_selector(selector)
     return selector.id
+end
+
+---@param selector_id integer
+---@param user_data table
+function M.run(selector_id, user_data)
+    return core.get_selector(selector_id):run(user_data)
 end
 
 return M

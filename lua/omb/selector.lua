@@ -39,4 +39,20 @@ function Selector:get_child_handler()
     return core.get_component(self.handler_id)
 end
 
+function Selector:run(user_data)
+    local source = self:get_child_source()
+    local display = self:get_child_display()
+    local handler = self:get_child_handler()
+    -- TODO: only update when needed; add cache
+    source:update(user_data)
+    display:update(source.ctx)
+    display:show()
+    local out
+    vim.schedule(function()
+        out = handler:run(source.ctx)
+        display:hide()
+    end)
+    return out
+end
+
 return Selector
