@@ -34,24 +34,6 @@ function M.clamp(n, min, max)
     return math.max(math.min(n, max), min)
 end
 
----Resolves and clamps width between min and max
----@param width number
----@param min number
----@param max number
----@return number
-function M.clamp_width(width, min, max)
-    return M.clamp(M.resolve_width(width), M.resolve_width(min), M.resolve_width(max))
-end
-
----Resolves and clamps height between min and max
----@param height number
----@param min number
----@param max number
----@return number
-function M.clamp_height(height, min, max)
-    return M.clamp(M.resolve_height(height), M.resolve_height(min), M.resolve_height(max))
-end
-
 ---Returns first duplicate in a list or nil if there aren't any
 ---@generic T
 ---@param list T[]

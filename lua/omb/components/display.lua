@@ -38,9 +38,15 @@ function Display.new(config)
     local width, height = config.width or "flex", config.height or "flex"
     if type(width) == "number" then
         width = utils.resolve_width(width)
+    elseif type(width) == "table" then
+        width.min = utils.resolve_width(width.min or 0)
+        width.max = utils.resolve_width(width.max or 1)
     end
     if type(height) == "number" then
         height = utils.resolve_height(height)
+    elseif type(height) == "table" then
+        height.min = utils.resolve_height(height.min or 0)
+        height.max = utils.resolve_height(height.max or 1)
     end
     local ypos, xpos = unpack(vim.fn.split(config.pos or "center_center", "_"))
 
@@ -70,12 +76,12 @@ function Display:_get_rect()
     if width == "flex" then
         width = self.state.max_width
     elseif type(width) == "table" then
-        width = utils.clamp_width(self.state.max_width, width.min or 0, width.max or 1)
+        width = utils.clamp(self.state.max_width, width.min, width.max)
     end
     if height == "flex" then
         height = self.state.max_height
     elseif type(height) == "table" then
-        height = utils.clamp_height(self.state.max_height, height.min or 0, height.max or 1)
+        height = utils.clamp(self.state.max_height, height.min, height.max)
     end
     ---@cast width integer
     ---@cast height integer
