@@ -1,7 +1,6 @@
 local utils = require("omb.utils")
 
 ---@alias omb.Source.Provider fun(ctx: omb.Source.ProviderContext, my: table): list: any[]
----@alias omb.Source.Sorter fun(ctx: omb.Source.SorterContext, my: table): sorted: any[]
 ---@alias omb.Source.Format fun(ctx: omb.Source.FormatContext, my: table): fmt_items: (omb.Source.FmtItem)[]|string
 ---@alias omb.Source.Assigner fun(ctx: omb.Source.AssignerContext, my: table): assigned_keys: string[]
 
@@ -11,7 +10,6 @@ local utils = require("omb.utils")
 
 ---@class omb.Source.Config
 ---@field provider omb.Source.Provider
----@field sorter? omb.Source.Sorter
 ---@field format? omb.Source.Format
 ---@field assigner omb.Source.Assigner
 
@@ -36,7 +34,6 @@ local utils = require("omb.utils")
 ---@class omb.Source
 ---@field base omb.BaseComponent
 ---@field provider omb.Source.Provider
----@field sorter omb.Source.Sorter
 ---@field format omb.Source.Format
 ---@field assigner omb.Source.Assigner
 ---@field ctx omb.Source.PartialContext|omb.Source.FullContext
@@ -51,9 +48,6 @@ function Source.new(config)
         provider = config.provider,
         format = config.format or function(ctx)
             return tostring(ctx.item)
-        end,
-        sorter = config.sorter or function(ctx)
-            return ctx.list
         end,
         assigner = config.assigner,
         ctx = {},
@@ -101,7 +95,6 @@ function Source:update(user_data)
         ctx.formatted[i] = text
         ctx.highlights[i] = hls
     end
-    ctx.list = self.sorter(ctx, user_data)
     ctx.keys = self.assigner(ctx, user_data)
 
     assert(#ctx.keys > 0, "no keys assigned in source")
