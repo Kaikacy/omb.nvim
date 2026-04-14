@@ -26,9 +26,9 @@ T["get_formatted_list"] = function()
             return { "a", "b", "c", "d" }
         end,
     })
-    source:update()
+    source:update({})
 
-    local keys, items, hls = source:get_formatted_list()
+    local keys, items, hls = source.ctx.keys, source.ctx.formatted, source.ctx.highlights
     for i, key, item, hl in require("omb.utils").zip_iter3(keys, items, hls) do
         h.eq(expected[i], { key, item, hl })
     end
@@ -65,7 +65,7 @@ T["format function"] = function()
             return vim.tbl_map(tostring, ctx.list)
         end,
     })
-    source:update()
+    source:update({})
 
     for i, key in ipairs(source.ctx.keys) do
         h.eq(expected[i], { key, source.ctx.formatted[i], source.ctx.highlights[i] })
