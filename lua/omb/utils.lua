@@ -49,6 +49,19 @@ function M.get_first_dup(list)
     return nil
 end
 
+---Given list of tables, returns list of field values from each table
+---@generic T
+---@param tbl_list table<string, any>[]
+---@param field string
+---@return T[]
+function M.get_field_list(tbl_list, field)
+    local out = {}
+    for i, tbl in ipairs(tbl_list) do
+        out[i] = tbl[field]
+    end
+    return out
+end
+
 ---Zips two lists and returns iterator to use in for loop (idx, elem1, elem2)
 ---Doesn't check list size
 ---@generic T, U, V

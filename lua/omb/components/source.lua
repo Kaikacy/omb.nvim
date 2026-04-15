@@ -79,8 +79,8 @@ function Source:update(user_data)
     end
     ---@cast items omb.Source.Item[]
 
-    -- FIXME: refactor for item-obj system
-    -- assert(utils.get_first_dup(ctx.keys) == nil, "duplicate key")
+    -- TODO: shouldn't be assert
+    assert(utils.get_first_dup(utils.get_field_list(items, "keys")) == nil, "duplicate key")
 end
 
 return Source
