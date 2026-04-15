@@ -81,6 +81,8 @@ function Source:update(user_data)
 
     -- TODO: shouldn't be assert
     assert(utils.get_first_dup(utils.get_field_list(items, "keys")) == nil, "duplicate key")
+
+    self.items = items
 end
 
 return Source
