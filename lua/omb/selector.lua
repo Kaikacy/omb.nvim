@@ -17,10 +17,6 @@ function Selector.new(source_id, display_id, handler_id)
         display_id = display_id,
         handler_id = handler_id,
     }
-    core.set_component_parent(source_id, id)
-    core.set_component_parent(display_id, id)
-    core.set_component_parent(handler_id, id)
-
     return setmetatable(selector, { __index = Selector })
 end
 

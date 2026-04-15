@@ -3,8 +3,9 @@
 local M = {}
 
 ---@class omb.State
----@field win integer
 ---@field ns integer
+---@field win integer
+---@field selector integer
 ---@field selectors omb.Selector[]
 ---@field components omb.Component[]
 ---@field safe_id integer
@@ -12,8 +13,9 @@ local M = {}
 ---Global state
 ---@type omb.State
 local state = {
-    win = -1,
     ns = vim.api.nvim_create_namespace("omb-display"),
+    win = -1,
+    selector = -1,
     selectors = {},
     components = {},
     safe_id = 0, -- unique id; shall be used for everything
@@ -38,6 +40,17 @@ function M.get_selector(id)
     return state.selectors[id]
 end
 
+function M.get_active_selector()
+    return state.selectors[state.selector]
+end
+
+---@param id integer
+function M.activate_selector(id)
+    -- TODO: better handling
+    assert(state.selector == -1, "another selector is active")
+    state.selector = id
+end
+
 ---@param component omb.Component
 function M.register_component(component)
     state.components[component.base.id] = component
@@ -47,12 +60,6 @@ end
 ---@return omb.Component
 function M.get_component(id)
     return state.components[id]
-end
-
----@param component_id integer
----@param parent_id integer
-function M.set_component_parent(component_id, parent_id)
-    state.components[component_id].base.parent_id = parent_id
 end
 
 return M
