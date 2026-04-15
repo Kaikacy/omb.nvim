@@ -110,8 +110,8 @@ function Display:_get_rect()
     return row, col, width, height, yanchor .. xanchor
 end
 
----@param source_ctx omb.Source.FullContext
-function Display:update(source_ctx)
+---@param items omb.Source.Item[]
+function Display:update(items)
     if not vim.api.nvim_buf_is_valid(self.state.buf) then
         self.state.buf = vim.api.nvim_create_buf(false, true)
         assert(self.state.buf ~= 0, "couldn't create buffer")
@@ -119,8 +119,8 @@ function Display:update(source_ctx)
     local buf = self.state.buf
 
     local lines = {}
-    for _, key, item in utils.zip_iter(source_ctx.keys, source_ctx.formatted) do
-        local line = key .. self.key_separator .. item
+    for _, item in ipairs(items) do
+        local line = item.key .. self.key_separator .. item.text
         table.insert(lines, line)
         if self.state.max_width < #line then
             self.state.max_width = #line
@@ -135,15 +135,15 @@ function Display:update(source_ctx)
     -- display lines
     vim.api.nvim_buf_set_lines(buf, 0, #lines, false, lines)
 
-    for i, key, hl_ranges in utils.zip_iter(source_ctx.keys, source_ctx.highlights) do
-        local item_start = #key + #self.key_separator
-        for _, hl_range in ipairs(hl_ranges) do
+    for i, item in ipairs(items) do
+        local text_start = #item.key + #self.key_separator
+        for _, hl_range in ipairs(item.hl_ranges) do
             vim.api.nvim_buf_set_extmark(
                 buf,
                 self.ns,
                 i - 1, -- 0-based
-                hl_range[1] + item_start,
-                { end_col = hl_range[2] + item_start, hl_group = hl_range[3] }
+                text_start + hl_range[1],
+                { end_col = text_start + hl_range[2], hl_group = hl_range[3] }
             )
         end
     end

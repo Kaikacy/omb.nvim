@@ -1,12 +1,6 @@
 local utils = require("omb.utils")
 
----@alias omb.Handler.Action fun(ctx: omb.Handler.ActionContext): any
-
----@class omb.Handler.ActionContext
----@field key string
----@field item any
----@field formatted string
----@field index integer
+---@alias omb.Handler.Action fun(item: omb.Source.Item, idx: integer): any
 
 ---@class omb.Handler.Config
 ---@field cancel_key? string|string[]
@@ -39,9 +33,9 @@ function Handler.new(config)
     return setmetatable(handler, { __index = Handler })
 end
 
----@param source_ctx omb.Source.FullContext
----@return omb.Handler.ActionContext?
-function Handler:run(source_ctx)
+---@param items omb.Source.Item[]
+---@return any
+function Handler:run(items)
     -- TODO: catch interupt (<C-c>)
     local char = vim.fn.getcharstr(-1, { cursor = "keep" })
 
@@ -51,9 +45,10 @@ function Handler:run(source_ctx)
         end
     end
 
-    for i, key, item, formatted in utils.zip_iter3(source_ctx.keys, source_ctx.list, source_ctx.formatted) do
-        if char == vim.keycode(key) then
-            return self.action({ key = key, item = item, formatted = formatted, index = i })
+    for i, item in ipairs(items) do
+        -- TODO: should't run keycode every time
+        if char == vim.keycode(item.key) then
+            return self.action(item, i)
         end
     end
     -- error("input char isn't assigned to item")
