@@ -74,5 +74,35 @@ T["format"] = function()
         h.eq(expected[i], { item.text, item.hl_ranges })
     end
 end
+T["user data"] = function()
+    local source = M.new({
+        provider = function(my)
+            local items = {}
+            for i = 1, (my.cnt and my.cnt or 3) do
+                items[i] = { key = tostring(i), value = i, data = string.char(i + 96) }
+            end
+            my.something = 1
+            return items
+        end,
+        format = function(item, i, my)
+            h.eq(string.char(i + 96), item.data)
+            h.eq(i, my.something)
+            my.something = my.something + 1
+            return tostring(item.value)
+        end,
+    })
+    -- expected: key, value, data
+    local expected = { { "1", 1, "a" }, { "2", 2, "b" } }
+    source:update({ cnt = 2 })
+    for i, item in ipairs(source.items) do
+        h.eq(expected[i], { item.key, item.value, item.data })
+    end
+
+    expected = { { "1", 1, "a" }, { "2", 2, "b" }, { "3", 3, "c" } }
+    source:update({})
+    for i, item in ipairs(source.items) do
+        h.eq(expected[i], { item.key, item.value, item.data })
+    end
+end
 
 return T
