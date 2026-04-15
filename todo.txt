@@ -42,7 +42,7 @@ X ADD ID SYSTEM FOR EVERY COMPONENT AND SELECTOR
         - Components can communicate with each other via parent selector, enhancing DX
 
 !! EXPERIMENTAL !!
-- REDESIGN SOURCE COMPONENT AND ADD ITEM OBJECT
+X REDESIGN SOURCE COMPONENT AND ADD ITEM OBJECT
     * Simplifies source component and improves UX *
     Source component will only have single user funtion that returns list of new item objects. Instead of SoA pattern, AoS will be used.
     Item object will contain all the information about single item, including assigned key, raw value, formatted value and highlights. Although unsure, it might also contain user data for that specific object.
