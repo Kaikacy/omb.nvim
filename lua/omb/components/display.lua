@@ -23,7 +23,6 @@ local utils = require("omb.utils")
 ---@class omb.Display
 ---@field base omb.BaseComponent
 ---@field key_separator string
----@field ns number
 ---@field xpos "left"|"right"|"center"
 ---@field ypos "top"|"bottom"|"center"
 ---@field width omb.Display.Size
@@ -59,7 +58,6 @@ function Display.new(config)
         width = width,
         height = height,
         extends_char = config.extends_char or ">",
-        ns = core.state.ns,
         state = {
             buf = -1,
             max_width = -1,
@@ -129,7 +127,7 @@ function Display:update(source_ctx)
     self.state.max_height = #lines
 
     -- clear the buffer (TODO: this shouldn't be done always, like when reusing cached values, once I add cache)
-    vim.api.nvim_buf_clear_namespace(buf, self.ns, 0, -1)
+    vim.api.nvim_buf_clear_namespace(buf, core.state.ns, 0, -1)
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, {})
 
     -- display lines
@@ -140,7 +138,7 @@ function Display:update(source_ctx)
         for _, hl_range in ipairs(hl_ranges) do
             vim.api.nvim_buf_set_extmark(
                 buf,
-                self.ns,
+                core.state.ns,
                 i - 1, -- 0-based
                 hl_range[1] + item_start,
                 { end_col = hl_range[2] + item_start, hl_group = hl_range[3] }
