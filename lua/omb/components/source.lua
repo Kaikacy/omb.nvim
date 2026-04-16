@@ -1,33 +1,33 @@
 local utils = require("omb.utils")
 
----@alias omb.Source.Provider fun(my: table): omb.Source.PartialItem[]
----@alias omb.Source.Format fun(item: omb.Source.PartialItem, idx: integer, my: table): omb.Source.FmtItem
+---@alias omb.source.provider fun(my: table): omb.source.PartialItem[]
+---@alias omb.source.format fun(item: omb.source.PartialItem, idx: integer, my: table): omb.source.fmtItem
 
----@alias omb.Source.FmtSegment [string, string?] text and hl-group or just text
----@alias omb.Source.FmtItem omb.Source.FmtSegment[]|string
----@alias omb.Source.HlRange [integer, integer, string] start column, end column (0-based, end-exclusive) and hl-group
+---@alias omb.source.fmtSegment [string, string?] text and hl-group or just text
+---@alias omb.source.fmtItem omb.source.fmtSegment[]|string
+---@alias omb.source.hlRange [integer, integer, string] start column, end column (0-based, end-exclusive) and hl-group
 
----@class omb.Source.Config
----@field provider omb.Source.Provider
----@field format? omb.Source.Format
+---@class omb.source.Config
+---@field provider omb.source.provider
+---@field format? omb.source.format
 
----@class omb.Source.PartialItem
+---@class omb.source.PartialItem
 ---@field value any
 ---@field key string
 ---@field data any item user data
 
----@class omb.Source.Item: omb.Source.PartialItem
+---@class omb.source.Item: omb.source.PartialItem
 ---@field text string
----@field hl_ranges omb.Source.HlRange[]
+---@field hl_ranges omb.source.hlRange[]
 
 ---@class omb.Source
 ---@field base omb.BaseComponent
----@field provider omb.Source.Provider
----@field format omb.Source.Format
----@field items omb.Source.PartialItem[]|omb.Source.Item[]
+---@field provider omb.source.provider
+---@field format omb.source.format
+---@field items omb.source.PartialItem[]|omb.source.Item[]
 local Source = {}
 
----@param config omb.Source.Config
+---@param config omb.source.Config
 ---@return omb.Source
 function Source.new(config)
     ---@type omb.Source
@@ -42,8 +42,8 @@ function Source.new(config)
     return setmetatable(source, { __index = Source })
 end
 
----@param fmt_item omb.Source.FmtItem
----@return string, omb.Source.HlRange[]
+---@param fmt_item omb.source.fmtItem
+---@return string, omb.source.hlRange[]
 function Source:_fmt_item_to_pair(fmt_item)
     if type(fmt_item) == "string" then
         return fmt_item, {}
@@ -73,11 +73,11 @@ function Source:update(user_data)
     for i, item in ipairs(items) do
         local fmt_item = self.format(item, i, user_data)
         local text, hl_ranges = self:_fmt_item_to_pair(fmt_item)
-        ---@cast item omb.Source.Item
+        ---@cast item omb.source.Item
         item.text = text
         item.hl_ranges = hl_ranges
     end
-    ---@cast items omb.Source.Item[]
+    ---@cast items omb.source.Item[]
 
     -- TODO: shouldn't be assert
     assert(utils.get_first_dup(utils.get_field_list(items, "keys")) == nil, "duplicate key")

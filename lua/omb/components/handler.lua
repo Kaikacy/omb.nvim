@@ -1,18 +1,18 @@
 local utils = require("omb.utils")
 
----@alias omb.Handler.Action fun(item: omb.Source.Item, idx: integer): any
+---@alias omb.handler.action fun(item: omb.source.Item, idx: integer): any
 
----@class omb.Handler.Config
+---@class omb.handler.Config
 ---@field cancel_key? string|string[]
----@field action? omb.Handler.Action
+---@field action? omb.handler.action
 
 ---@class omb.Handler
 ---@field base omb.BaseComponent
----@field action omb.Handler.Action
+---@field action omb.handler.action
 ---@field cancel_keys string[]
 local Handler = {}
 
----@param config omb.Handler.Config
+---@param config omb.handler.Config
 function Handler.new(config)
     local cancel_keys = { "" } -- <ESC>
     if type(config.cancel_key) == "string" then
@@ -33,7 +33,7 @@ function Handler.new(config)
     return setmetatable(handler, { __index = Handler })
 end
 
----@param items omb.Source.Item[]
+---@param items omb.source.Item[]
 ---@return any
 function Handler:run(items)
     -- TODO: catch interupt (<C-c>)

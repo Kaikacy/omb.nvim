@@ -1,21 +1,17 @@
 local core = require("omb.core")
 local utils = require("omb.utils")
 
----@alias omb.Display.Pos "top_left"|"top_center"|"top_right"|"center_left"|"center_center"|"center_right"|"bottom_left"|"bottom_center"|"bottom_right"
----@alias omb.Display.Size number|"flex"|{min?: number, max?: number}
+---@alias omb.display.pos "top_left"|"top_center"|"top_right"|"center_left"|"center_center"|"center_right"|"bottom_left"|"bottom_center"|"bottom_right"
+---@alias omb.display.size number|"flex"|{min?: number, max?: number}
 
----@class omb.Display.Config
+---@class omb.display.Config
 ---@field key_separator? string
----@field pos? omb.Display.Pos
----@field width? omb.Display.Size
----@field height? omb.Display.Size
+---@field pos? omb.display.pos
+---@field width? omb.display.size
+---@field height? omb.display.size
 ---@field extends_char? string
 
----@class omb.Display.HighlighterContext
----@field item string
----@field key string
-
----@class omb.Display.State
+---@class omb.display.State
 ---@field buf integer
 ---@field max_width integer
 ---@field max_height integer
@@ -25,13 +21,13 @@ local utils = require("omb.utils")
 ---@field key_separator string
 ---@field xpos "left"|"right"|"center"
 ---@field ypos "top"|"bottom"|"center"
----@field width omb.Display.Size
----@field height omb.Display.Size
+---@field width omb.display.size
+---@field height omb.display.size
 ---@field extends_char string
----@field state omb.Display.State
+---@field state omb.display.State
 local Display = {}
 
----@param config omb.Display.Config
+---@param config omb.display.Config
 ---@return omb.Display
 function Display.new(config)
     local width, height = config.width or "flex", config.height or "flex"
@@ -108,7 +104,7 @@ function Display:_get_rect()
     return row, col, width, height, yanchor .. xanchor
 end
 
----@param items omb.Source.Item[]
+---@param items omb.source.Item[]
 function Display:update(items)
     if not vim.api.nvim_buf_is_valid(self.state.buf) then
         self.state.buf = vim.api.nvim_create_buf(false, true)

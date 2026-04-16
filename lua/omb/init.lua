@@ -2,7 +2,7 @@ local core = require("omb.core")
 
 local M = {}
 
----@param config omb.Source.Config
+---@param config omb.source.Config
 ---@return integer id
 function M.new_source(config)
     local source = require("omb.components.source").new(config)
@@ -10,7 +10,7 @@ function M.new_source(config)
     return source.base.id
 end
 
----@param config omb.Display.Config
+---@param config omb.display.Config
 ---@return integer id
 function M.new_display(config)
     local display = require("omb.components.display").new(config)
@@ -18,7 +18,7 @@ function M.new_display(config)
     return display.base.id
 end
 
----@param config omb.Handler.Config
+---@param config omb.handler.Config
 ---@return integer id
 function M.new_handler(config)
     local handler = require("omb.components.handler").new(config)
