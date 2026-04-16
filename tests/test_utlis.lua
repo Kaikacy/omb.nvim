@@ -27,6 +27,19 @@ T["get first dup"] = function()
     h.eq(child.lua_get([[M.get_first_dup({1, 2, 3, 2, 4})]]), 2)
     h.eq(child.lua_get([[M.get_first_dup({1, 2, 3, 4})]]), vim.NIL)
 end
+T["get field list"] = function()
+    local expected_lists = {
+        { 1, 2, 3 },
+        { 1, nil, 3 },
+    }
+    local lists = {
+        { { key = 1 }, { key = 2, foo = true }, { key = 3 } },
+        { { key = 1 }, { foo = true }, { key = 3 } },
+    }
+    for _, expected, list in M.zip_iter(expected_lists, lists) do
+        h.eq(expected, M.get_field_list(list, "key"))
+    end
+end
 T["zip iter"] = function()
     local expected = {
         { "a", "A", "1" },

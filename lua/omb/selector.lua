@@ -41,11 +41,11 @@ function Selector:run(user_data)
     local handler = self:get_child_handler()
     -- TODO: only update when needed; add cache
     source:update(user_data)
-    display:update(source.ctx)
+    display:update(source.items)
     display:show()
     local out
     vim.schedule(function()
-        out = handler:run(source.ctx)
+        out = handler:run(source.items)
         display:hide()
     end)
     return out
