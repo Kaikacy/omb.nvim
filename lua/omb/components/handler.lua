@@ -11,16 +11,21 @@ local utils = require("omb.utils")
 ---@field action omb.handler.action
 ---@field cancel_keys string[]
 local Handler = {}
+Handler.__index = Handler
 
 ---@param config omb.handler.Config
 function Handler.new(config)
-    local cancel_keys = { "" } -- <ESC>
-    if type(config.cancel_key) == "string" then
-        cancel_keys = { vim.keycode(config.cancel_key) }
+    local cancel_keys = config.cancel_key
+    if type(cancel_keys) == "nil" then
+        cancel_keys = { "" } -- <ESC>
+    elseif type(cancel_keys) == "string" then
+        cancel_keys = { vim.keycode(cancel_keys) }
     elseif type(config.cancel_key) == "table" then
         cancel_keys = vim.tbl_map(function(key)
             return vim.keycode(key)
-        end, config.cancel_key)
+        end, cancel_keys)
+    else
+        error("Handler: invalid cancel_key")
     end
     ---@type omb.Handler
     local handler = {
@@ -30,7 +35,7 @@ function Handler.new(config)
         end,
         cancel_keys = cancel_keys,
     }
-    return setmetatable(handler, { __index = Handler })
+    return setmetatable(handler, Handler)
 end
 
 ---@param items omb.source.Item[]

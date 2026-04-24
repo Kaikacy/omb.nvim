@@ -6,6 +6,7 @@ local core = require("omb.core")
 ---@field handler_id integer
 ---@field id integer
 local Selector = {}
+Selector.__index = Selector
 
 ---@return omb.Selector
 function Selector.new(source_id, display_id, handler_id)
@@ -17,7 +18,7 @@ function Selector.new(source_id, display_id, handler_id)
         display_id = display_id,
         handler_id = handler_id,
     }
-    return setmetatable(selector, { __index = Selector })
+    return setmetatable(selector, Selector)
 end
 
 function Selector:get_child_source()
@@ -36,6 +37,7 @@ function Selector:get_child_handler()
 end
 
 function Selector:run(user_data)
+    core.activate_selector(self.id)
     local source = self:get_child_source()
     local display = self:get_child_display()
     local handler = self:get_child_handler()

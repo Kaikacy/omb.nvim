@@ -26,6 +26,7 @@ local utils = require("omb.utils")
 ---@field format omb.source.format
 ---@field items omb.source.PartialItem[]|omb.source.Item[]
 local Source = {}
+Source.__index = Source
 
 ---@param config omb.source.Config
 ---@return omb.Source
@@ -39,7 +40,7 @@ function Source.new(config)
         end,
         items = {},
     }
-    return setmetatable(source, { __index = Source })
+    return setmetatable(source, Source)
 end
 
 ---@param fmt_item omb.source.fmtItem

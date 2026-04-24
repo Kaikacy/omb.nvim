@@ -9,20 +9,19 @@ local M = {}
 ---@field selectors omb.Selector[]
 ---@field components omb.Component[]
 ---@field safe_id integer
-
 ---Global state
----@type omb.State
 local state = {
     ns = vim.api.nvim_create_namespace("omb-display"),
     win = -1,
     selector = -1,
     selectors = {},
     components = {},
-    safe_id = 0, -- unique id; shall be used for everything
+    safe_id = 1000, -- unique id; 1-999 is reserved
 }
+state.__index = state
 ---@type omb.State|{}
 M.state = {}
-setmetatable(M.state, { __index = state })
+setmetatable(M.state, state)
 
 function M.next_id()
     state.safe_id = state.safe_id + 1
@@ -46,7 +45,6 @@ end
 
 ---@param id integer
 function M.activate_selector(id)
-    -- TODO: better handling
     assert(state.selector == -1, "another selector is active")
     state.selector = id
 end

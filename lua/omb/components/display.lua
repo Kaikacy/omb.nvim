@@ -26,6 +26,7 @@ local utils = require("omb.utils")
 ---@field extends_char string
 ---@field state omb.display.State
 local Display = {}
+Display.__index = Display
 
 ---@param config omb.display.Config
 ---@return omb.Display
@@ -60,7 +61,7 @@ function Display.new(config)
             max_height = -1,
         },
     }
-    return setmetatable(display, { __index = Display })
+    return setmetatable(display, Display)
 end
 
 ---fails if update wasn't called as max_width/height are invalid
