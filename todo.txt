@@ -1,49 +1,8 @@
-X REDESIGN SOURCE ASSIGNER, ADD SOURCE SORTER
-    * Simplifies assigner with negligible downside *
-    Instead of returning two tables, assigner will only return sorted keys, for values sorter subcomponent should be used.
-    No map structure (hashmap) will be ever used.
-    Keys list returned by assigner shall have same length as items list.
-    Separate sorters could be used before and after formatter.
+!! experimental !!
+- FULL REWRITE; REMOVE COMPONENTS
+    * Simplifies plugin and selector creation, improving DX and UX *
+    Component objects and ID system will be removed. Instead config will be passed to selector creation function.
+    Selector creation function will return selector object with methods.
+    Source, display and handler options will still be distinguishable for easy config sharing between selectors.
     Conciderations:
-        - Unlike before, validation will be required to ensure no key name conflicts
-
-X MERGE DISPLAY HIGHLIGHT SUBCOMPONENT INTO SOURCE FORMATTER
-    * Simplifies highlight system and display component *
-    Remove highlight subcomponent and instead expand functionallity of source formatter.
-    Although unsure, formatter could return list of text chunks paired with highlight group. Texts will be concatinated to create an item. Highlights will be used by display. System was inspired by API of neovim itself.
-    Source context after formatter will contain structured and raw information about format.
-    Other benefits:
-        - Guaranteed safety from out-of-range errors when highlighting
-        - Greatly enhances UX, by avoiding index calculations and length checks by user
-
-X REPLACE SOURCE FORMATTER WITH FORMAT ITERATOR
-    * Improves UX *
-    Formatter function will be run for each item in the provided list. Structuring returned value will be handled internally.
-    Formatter Context will only contain information about current item.
-
-- FINISH HANDLING SYSTEM AND HANDLER COMPONENT
-    * Makes handler component much more powerful *
-    On top of user interaction, any other component error will be redirected to handler. Error handling will be fully cusomizable. As lua does not have error handling system, error codes will be used.
-    Although unsure, custom action might not be specifiable, instead, after successful selection handler will return information about selected item.
-    If desired by user, any untrusted function could be run in protected mode
-
-X ADD ID SYSTEM FOR EVERY COMPONENT AND SELECTOR
-    * Gives users much more flexibility and improves DX *
-    Every component and selector will have unique id, internally represented by hex string.
-    Actual component table will be stored in shared state; Users will interact with it using provided API, similar to neovim's system.
-    Selector will hold children (components) ids and each component will hold parent's id, which will be assigned by selector when modified.
-    Already registered selectors shall be modifiable.
-    Conciderations:
-        - API will change
-            Although unsure, for each component, constructor function could be exposed, which will return id.
-    Benefits:
-        - Component configuration can be trivially replaced, without creating separate selector
-        - Single component can be shared between multiple selectors
-        - Components can communicate with each other via parent selector, enhancing DX
-
-!! EXPERIMENTAL !!
-X REDESIGN SOURCE COMPONENT AND ADD ITEM OBJECT
-    * Simplifies source component and improves UX *
-    Source component will only have single user funtion that returns list of new item objects. Instead of SoA pattern, AoS will be used.
-    Item object will contain all the information about single item, including assigned key, raw value, formatted value and highlights. Although unsure, it might also contain user data for that specific object.
-    !! Even though API will be simplified, still unsure if this is a good idea, as manipulating source context step-by-step might be easier than all at once in a single function !!
+        - Huge rewrite; API and backend will be redesigned.
