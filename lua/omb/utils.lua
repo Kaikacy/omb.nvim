@@ -99,4 +99,31 @@ function M.zip_iter3(list1, list2, list3)
     end
 end
 
+---Generate text and hl_ranges from fmt.item
+---@param item omb.fmt.item
+---@return string text, omb.item.hlRange[] hl_ranges
+function M.fmt_item_to_pair(item)
+    if type(item) == "string" then
+        return item, {}
+    end
+    local text = ""
+    local hl_ranges = {}
+    for _, segment in ipairs(item) do
+        if #segment[1] > 0 then
+            if segment[2] then
+                -- segment: [text, hl-group]
+                table.insert(hl_ranges, { #text, #text + #segment[1], segment[2] }) -- start, end, hl-group
+            end
+            text = text .. segment[1]
+        end
+    end
+    return text, hl_ranges
+end
+
+---@param msg string
+---@param level? integer
+function M.notify(msg, level)
+    vim.notify(msg, level, { title = "omb.nvim" })
+end
+
 return M
